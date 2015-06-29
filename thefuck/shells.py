@@ -33,7 +33,7 @@ class Generic(object):
         return command_script
 
     def app_alias(self):
-        return "\nalias fuck='eval $(thefuck $(fc -ln -1))'\n"
+        return "\nalias fuck='TF_ALIAS=fuck eval $(thefuck $(fc -ln -1))'\n"
 
     def _get_history_file_name(self):
         return ''
@@ -49,12 +49,13 @@ class Generic(object):
                 history.write(self._get_history_line(command_script))
 
     def and_(self, *commands):
-        return ' && '.join(commands)
+        return u' && '.join(commands)
 
 
 class Bash(Generic):
     def app_alias(self):
-        return "\nalias fuck='eval $(thefuck $(fc -ln -1)); history -r'\n"
+        return "\nTF_ALIAS=fuck alias fuck='eval $(thefuck $(fc -ln -1));" \
+               " history -r'\n"
 
     def _parse_alias(self, alias):
         name, value = alias.replace('alias ', '', 1).split('=', 1)
@@ -83,6 +84,7 @@ class Fish(Generic):
     def app_alias(self):
         return ("function fuck -d 'Correct your previous console command'\n"
                 "    set -l exit_code $status\n"
+                "    set -l TF_ALIAS fuck\n"
                 "    set -l eval_script"
                 " (mktemp 2>/dev/null ; or mktemp -t 'thefuck')\n"
                 "    set -l fucked_up_commandd $history[1]\n"
@@ -105,7 +107,7 @@ class Fish(Generic):
         aliases = self.get_aliases()
         binary = command_script.split(' ')[0]
         if binary in aliases:
-            return 'fish -ic "{}"'.format(command_script.replace('"', r'\"'))
+            return u'fish -ic "{}"'.format(command_script.replace('"', r'\"'))
         else:
             return command_script
 
@@ -120,12 +122,14 @@ class Fish(Generic):
         return u'- cmd: {}\n   when: {}\n'.format(command_script, int(time()))
 
     def and_(self, *commands):
-        return '; and '.join(commands)
+        return u'; and '.join(commands)
 
 
 class Zsh(Generic):
     def app_alias(self):
-        return "\nalias fuck='eval $(thefuck $(fc -ln -1 | tail -n 1)); fc -R'\n"
+        return "\nTF_ALIAS=fuck" \
+               " alias fuck='eval $(thefuck $(fc -ln -1 | tail -n 1));" \
+               " fc -R'\n"
 
     def _parse_alias(self, alias):
         name, value = alias.split('=', 1)
@@ -152,7 +156,7 @@ class Zsh(Generic):
 
 class Tcsh(Generic):
     def app_alias(self):
-        return "\nalias fuck 'set fucked_cmd=`history -h 2 | head -n 1` && eval `thefuck ${fucked_cmd}`'\n"
+        return "\nalias fuck 'setenv TF_ALIAS fuck && set fucked_cmd=`history -h 2 | head -n 1` && eval `thefuck ${fucked_cmd}`'\n"
 
     def _parse_alias(self, alias):
         name, value = alias.split("\t", 1)
@@ -201,6 +205,10 @@ def to_shell(command):
 
 def app_alias():
     print(_get_shell().app_alias())
+
+
+def thefuck_alias():
+    return os.environ.get('TF_ALIAS', 'fuck')
 
 
 def put_to_history(command):

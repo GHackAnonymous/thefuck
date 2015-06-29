@@ -132,6 +132,7 @@ thefuck-alias >> ~/.bashrc
 [Or in your shell config (Bash, Zsh, Fish, Powershell).](https://github.com/nvbn/thefuck/wiki/Shell-aliases)
 
 Changes will be available only in a new shell session.
+To make them available immediately, run `source ~/.bashrc` (or your shell config file like `.zshrc`).
 
 
 ## Update
@@ -145,26 +146,31 @@ sudo pip install thefuck --upgrade
 The Fuck tries to match a rule for the previous command, creates a new command
 using the matched rule and runs it. Rules enabled by default are as follows:
 
+* `cargo` &ndash; runs `cargo build` instead of `cargo`;
+* `cargo_no_command` &ndash; fixes wrongs commands like `cargo buid`;
 * `cd_correction` &ndash; spellchecks and correct failed cd commands;
 * `cd_mkdir` &ndash; creates directories before cd'ing into them;
 * `cd_parent` &ndash; changes `cd..` to `cd ..`;
 * `composer_not_command` &ndash; fixes composer command name;
 * `cp_omitting_directory` &ndash; adds `-a` when you `cp` directory;
 * `cpp11` &ndash; add missing `-std=c++11` to `g++` or `clang++`;
-* `dry` &ndash; fix repetitions like "git git push";
 * `django_south_ghost` &ndash; adds `--delete-ghost-migrations` to failed because ghosts django south migration;
 * `django_south_merge` &ndash; adds `--merge` to inconsistent django south migration;
+* `dry` &ndash; fix repetitions like "git git push";
 * `fix_alt_space` &ndash; replaces Alt+Space with Space character;
-* `javac` &ndash; appends missing `.java` when compiling Java files;
-* `java` &ndash; removes `.java` extension when running Java programs;
 * `git_add` &ndash; fix *"Did you forget to 'git add'?"*;
+* `git_branch_list` &ndash; catches `git branch list` in place of `git branch` and removes created branch;
 * `git_checkout` &ndash; creates the branch before checking-out;
+* `git_diff_staged` &ndash; adds `--staged` to previous `git diff` with unexpected output;
 * `git_no_command` &ndash; fixes wrong git commands like `git brnch`;
 * `git_pull` &ndash; sets upstream before executing previous `git pull`;
 * `git_push` &ndash; adds `--set-upstream origin $branch` to previous failed `git push`;
 * `git_stash` &ndash; stashes you local modifications before rebasing or switching branch;
-* `grep_recursive` &ndash; adds `-r` when you trying to grep directory; 
+* `go_run` &ndash; appends `.go` extension when compiling/running Go programs
+* `grep_recursive` &ndash; adds `-r` when you trying to grep directory;
 * `has_exists_script` &ndash; prepends `./` when script/binary exists;
+* `java` &ndash; removes `.java` extension when running Java programs;
+* `javac` &ndash; appends missing `.java` when compiling Java files;
 * `lein_not_task` &ndash; fixes wrong `lein` tasks like `lein rpl`;
 * `ls_lah` &ndash; adds -lah to ls;
 * `man` &ndash; change manual section;
@@ -175,11 +181,15 @@ using the matched rule and runs it. Rules enabled by default are as follows:
 * `open` &ndash; prepends `http` to address passed to `open`;
 * `pip_unknown_command` &ndash; fixes wrong pip commands, for example `pip instatl/pip install`;
 * `python_command` &ndash; prepends `python` when you trying to run not executable/without `./` python script;
+* `python_execute` &ndash; appends missing `.py` when executing Python files;
+* `quotation_marks` &ndash; fixes uneven usage of `'` and `"` when containing args'
 * `rm_dir` &ndash; adds `-rf` when you trying to remove directory;
 * `sl_ls` &ndash; changes `sl` to `ls`;
 * `ssh_known_hosts` &ndash; removes host from `known_hosts` on warning;
 * `sudo` &ndash; prepends `sudo` to previous command if it failed because of permissions;
 * `switch_layout` &ndash; switches command from your local layout to en;
+* `systemctl` &ndash; correctly orders parameters of confusing systemctl;
+* `test.py` &ndasg; runs `py.test` instead of `test.py`;
 * `whois` &ndash; fixes `whois` command.
 
 Enabled by default only on specific platforms:
@@ -187,6 +197,7 @@ Enabled by default only on specific platforms:
 * `apt_get` &ndash; installs app from apt if it not installed;
 * `brew_install` &ndash; fixes formula name for `brew install`;
 * `brew_unknown_command` &ndash; fixes wrong brew commands, for example `brew docto/brew doctor`;
+* `brew_upgrade` &ndash; appends `--all` to `brew upgrade` as per Homebrew's new behaviour
 * `pacman` &ndash; installs app with `pacman` or `yaourt` if it is not installed.
 
 Bundled, but not enabled by default:
@@ -201,7 +212,7 @@ in `~/.thefuck/rules`. Rule should contain two functions:
 and `get_new_command(command: Command, settings: Settings) -> str`.
 Also the rule can contain optional function
 `side_effect(command: Command, settings: Settings) -> None` and
-optional boolean `enabled_by_default`
+optional boolean `enabled_by_default`.
 
 `Command` has three attributes: `script`, `stdout` and `stderr`.
 
